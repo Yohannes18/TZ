@@ -39,10 +39,10 @@ const sessionCookieName = process.env.SESSION_COOKIE_NAME || 'tradezella.sid';
 const sessionMaxAge = Number(process.env.SESSION_MAX_AGE_MS || 1000 * 60 * 60 * 24 * 7);
 const sessionStore = isProduction
   ? new PgSession({
-      pool,
-      tableName: 'user_sessions',
-      createTableIfMissing: true,
-    })
+    pool,
+    tableName: 'user_sessions',
+    createTableIfMissing: true,
+  })
   : undefined;
 
 const globalLimiter = rateLimit({
@@ -135,7 +135,7 @@ if (process.env.NODE_ENV !== 'test' && !process.env.JEST_WORKER_ID) {
     try {
       // Initialize database tables
       await initDb();
-      
+
       // Start the server
       const PORT = process.env.PORT || 5000;
       app.listen(PORT, () => {

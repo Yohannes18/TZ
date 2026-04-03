@@ -87,10 +87,10 @@ const ResetPasswordPage: React.FC = () => {
               </Button>
             </div>
             <div className="text-sm text-center">
-                <Link to="/login" className="font-medium text-purple-600 hover:text-purple-500">
-                  Return to login
-                </Link>
-              </div>
+              <Link to="/login" className="font-medium text-purple-600 hover:text-purple-500">
+                Return to login
+              </Link>
+            </div>
           </div>
         </div>
       </div>

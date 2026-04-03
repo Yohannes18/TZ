@@ -21,11 +21,11 @@ passport.deserializeUser(async (id, done) => {
 });
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET',
-    callbackURL: googleCallbackURL,
-    scope: ['profile', 'email']
-  },
+  clientID: process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET',
+  callbackURL: googleCallbackURL,
+  scope: ['profile', 'email']
+},
   async (accessToken, refreshToken, profile, done) => {
     const email = profile.emails[0].value;
     try {

@@ -25,17 +25,17 @@ function getSslConfig() {
 
 const connectionConfig = process.env.DATABASE_URL
   ? {
-      connectionString: process.env.DATABASE_URL,
-      ssl: getSslConfig(),
-    }
+    connectionString: process.env.DATABASE_URL,
+    ssl: getSslConfig(),
+  }
   : {
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT || 5432),
-      database: process.env.DB_NAME || 'tradezella',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      ssl: getSslConfig(),
-    };
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT || 5432),
+    database: process.env.DB_NAME || 'tradezella',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    ssl: getSslConfig(),
+  };
 
 // Create a PostgreSQL connection pool
 const pool = new Pool(connectionConfig);
@@ -48,7 +48,7 @@ export async function getDb() {
 // Function to run migration files
 export async function runMigrations() {
   const client = await pool.connect();
-  
+
   try {
     // Get all migration files and sort them
     const migrationsDirCandidates = [
@@ -64,15 +64,15 @@ export async function runMigrations() {
     const migrationFiles = fs.readdirSync(migrationsDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
-    
+
     console.log(`Found ${migrationFiles.length} migration files`);
-    
+
     // Run each migration file
     for (const file of migrationFiles) {
       console.log(`Running migration: ${file}`);
       const migrationPath = path.join(migrationsDir, file);
       const sql = fs.readFileSync(migrationPath, 'utf8');
-      
+
       try {
         await client.query(sql);
         console.log(`Successfully ran migration: ${file}`);
@@ -81,7 +81,7 @@ export async function runMigrations() {
         throw err;
       }
     }
-    
+
     console.log('All migrations completed successfully');
   } finally {
     client.release();
@@ -91,11 +91,11 @@ export async function runMigrations() {
 // Function to initialize the database with required tables
 export async function initDb() {
   const client = await pool.connect();
-  
+
   try {
     // Run all migrations
     await runMigrations();
-    
+
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Error initializing database:', err);

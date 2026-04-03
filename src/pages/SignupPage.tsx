@@ -22,13 +22,13 @@ const SignupPage: React.FC = () => {
         setError('Passwords do not match');
         return;
       }
-      
+
       // Validate password strength
       if (password.length < 6) {
         setError('Password must be at least 6 characters long');
         return;
       }
-      
+
       const response = await axios.post(`${API_URL}/api/auth/register`, { name, email, password });
       localStorage.setItem('token', response.data.token);
       navigate('/');
@@ -55,7 +55,7 @@ const SignupPage: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div className="space-y-6">
             {error && <p className="text-red-500 text-center">{error}</p>}
-            
+
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Full Name
@@ -73,7 +73,7 @@ const SignupPage: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
@@ -123,7 +123,7 @@ const SignupPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div>
               <label
                 htmlFor="confirm-password"

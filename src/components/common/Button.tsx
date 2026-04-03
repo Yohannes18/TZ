@@ -1,17 +1,17 @@
 import React from 'react';
-    
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'gradient';
   className?: string;
 }
 
-export default function Button({ 
-  children, 
-  variant = 'primary', 
-  className = '', 
+export default function Button({
+  children,
+  variant = 'primary',
+  className = '',
   disabled = false,
-  ...props 
+  ...props
 }: ButtonProps) {
   const baseStyles = 'px-6 py-2.5 rounded-md font-medium transition-all duration-200';
   const variants = {
@@ -23,7 +23,7 @@ export default function Button({
   const disabledStyles = 'opacity-50 cursor-not-allowed';
 
   return (
-    <button 
+    <button
       className={`${baseStyles} ${variants[variant]} ${className} ${disabled ? disabledStyles : ''}`}
       disabled={disabled}
       {...props}
