@@ -178,8 +178,11 @@ const SignupPage: React.FC = () => {
                   href={`${API_URL}/api/auth/google`}
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
                 >
-                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.418 3.582 8.097 8.097 9.872V14.28H5.64v-3.56h2.457v-2.66c0-2.43 1.45-3.778 3.655-3.778 1.045 0 2.115.197 2.115.197v3.08h-1.54c-1.18 0-1.54.72-1.54 1.47v1.84h3.4l-.54 3.56h-2.86v5.592C16.418 18.097 20 14.418 20 10c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
+                  <svg className="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.21-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.87c2.27-2.09 3.57-5.18 3.57-8.64z" />
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-3.87-3c-1.07.72-2.44 1.14-4.06 1.14-3.12 0-5.76-2.11-6.7-4.95H1.3v3.09A11.99 11.99 0 0 0 12 24z" />
+                    <path fill="#FBBC05" d="M5.3 14.28A7.2 7.2 0 0 1 4.93 12c0-.79.14-1.55.37-2.28V6.63H1.3A11.99 11.99 0 0 0 0 12c0 1.94.46 3.78 1.3 5.37l4-3.09z" />
+                    <path fill="#EA4335" d="M12 4.77c1.76 0 3.33.6 4.57 1.79l3.43-3.43C17.94 1.19 15.23 0 12 0 7.31 0 3.26 2.69 1.3 6.63l4 3.09c.94-2.84 3.58-4.95 6.7-4.95z" />
                   </svg>
                   <span className="ml-3">Sign up with Google</span>
                 </a>
