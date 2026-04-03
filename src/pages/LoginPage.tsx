@@ -3,8 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
 import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../lib/api';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +14,7 @@ const LoginPage: React.FC = () => {
 
   const handleSignIn = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
       localStorage.setItem('token', response.data.token);
       navigate('/');
     } catch (err: any) {
@@ -130,7 +129,7 @@ const LoginPage: React.FC = () => {
 
               <div className="mt-6">
                 <a
-                  href={`${API_BASE_URL}/api/auth/google`}
+                  href={`${API_URL}/api/auth/google`}
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
                 >
                   <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">

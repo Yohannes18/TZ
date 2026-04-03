@@ -1,8 +1,7 @@
 import { CategoryService } from '../../../src/services/category.service.js';
 import { CategoryModel } from '../../../src/models/category.model.js';
 
-// Clear any automatic mocks
-jest.clearAllMocks();
+jest.mock('../../../src/models/category.model.js');
 
 describe('CategoryService', () => {
   beforeEach(() => {

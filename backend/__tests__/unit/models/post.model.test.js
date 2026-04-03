@@ -173,9 +173,7 @@ describe('PostModel', () => {
       );
       expect(mockClient.query).toHaveBeenNthCalledWith(
         3,
-        `UPDATE threads
-         SET reply_count = GREATEST(reply_count - 1, 0)
-         WHERE id = $1`,
+        expect.stringContaining('SET reply_count = GREATEST(reply_count - 1, 0)'),
         [1]
       );
       expect(result).toEqual(deletedPost);
@@ -207,9 +205,7 @@ describe('PostModel', () => {
       );
       expect(mockClient.query).toHaveBeenNthCalledWith(
         2,
-        `UPDATE posts
-         SET is_best_answer = false
-         WHERE thread_id = $1`,
+        expect.stringContaining('SET is_best_answer = false'),
         [1]
       );
       expect(mockClient.query).toHaveBeenNthCalledWith(

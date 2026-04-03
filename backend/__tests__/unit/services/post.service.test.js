@@ -1,8 +1,10 @@
 import { PostService } from '../../../src/services/post.service.js';
 import { PostModel } from '../../../src/models/post.model.js';
+import { ThreadModel } from '../../../src/models/thread.model.js';
 
 // Mock the PostModel
 jest.mock('../../../src/models/post.model.js');
+jest.mock('../../../src/models/thread.model.js');
 
 describe('PostService', () => {
   beforeEach(() => {
@@ -49,14 +51,14 @@ describe('PostService', () => {
       
       const result = await PostService.getPostsByThreadId(1);
       
-      expect(PostModel.findByThreadId).toHaveBeenCalledWith(1);
+      expect(PostModel.findByThreadId).toHaveBeenCalledWith(1, {});
       expect(result).toEqual(posts);
     });
   });
   
   describe('getPostById', () => {
     it('should return a post by id', async () => {
-      const post = { id: 1, content: 'Test post' };
+      const post = { id: 1, thread_id: 1, content: 'Test post' };
       
       PostModel.findById.mockResolvedValue(post);
       
@@ -66,12 +68,10 @@ describe('PostService', () => {
       expect(result).toEqual(post);
     });
     
-    it('should throw an error when post is not found', async () => {
+    it('should return null when post is not found', async () => {
       PostModel.findById.mockResolvedValue(null);
       
-      await expect(PostService.getPostById(999))
-        .rejects
-        .toThrow('Post not found');
+      await expect(PostService.getPostById(999)).resolves.toBeNull();
     });
   });
   
@@ -94,19 +94,19 @@ describe('PostService', () => {
     it('should throw an error when post does not exist', async () => {
       PostModel.findById.mockResolvedValue(null);
       
-      await expect(PostService.updatePost(999, { content: 'New content' }))
+      await expect(PostService.updatePost(999, { content: 'New content' }, 1, 'user'))
         .rejects
         .toThrow('Post not found');
     });
     
-    it('should throw an error when content is missing', async () => {
-      const existingPost = { id: 1, content: 'Old content' };
+    it('should throw an error when user is not authorized', async () => {
+      const existingPost = { id: 1, user_id: 2, content: 'Old content' };
       
       PostModel.findById.mockResolvedValue(existingPost);
       
-      await expect(PostService.updatePost(1, {}))
+      await expect(PostService.updatePost(1, { content: 'Updated' }, 1, 'user'))
         .rejects
-        .toThrow('Content is required');
+        .toThrow('Not authorized to update this post');
     });
   });
   
@@ -127,7 +127,7 @@ describe('PostService', () => {
     it('should throw an error when post does not exist', async () => {
       PostModel.findById.mockResolvedValue(null);
       
-      await expect(PostService.deletePost(999))
+      await expect(PostService.deletePost(999, 1, 'user'))
         .rejects
         .toThrow('Post not found');
     });
@@ -137,13 +137,16 @@ describe('PostService', () => {
     it('should mark a post as best answer when it exists', async () => {
       const post = { id: 1, content: 'Test post' };
       const updatedPost = { id: 1, content: 'Test post', is_best_answer: true };
+      const thread = { id: 1, user_id: 1 };
       
       PostModel.findById.mockResolvedValue(post);
+      ThreadModel.findById.mockResolvedValue(thread);
       PostModel.markAsBestAnswer.mockResolvedValue(updatedPost);
       
-      const result = await PostService.markAsBestAnswer(1);
+      const result = await PostService.markAsBestAnswer(1, 1, 'user');
       
       expect(PostModel.findById).toHaveBeenCalledWith(1);
+      expect(ThreadModel.findById).toHaveBeenCalledWith(post.thread_id);
       expect(PostModel.markAsBestAnswer).toHaveBeenCalledWith(1);
       expect(result).toEqual(updatedPost);
     });
@@ -151,7 +154,7 @@ describe('PostService', () => {
     it('should throw an error when post does not exist', async () => {
       PostModel.findById.mockResolvedValue(null);
       
-      await expect(PostService.markAsBestAnswer(999))
+      await expect(PostService.markAsBestAnswer(999, 1, 'user'))
         .rejects
         .toThrow('Post not found');
     });

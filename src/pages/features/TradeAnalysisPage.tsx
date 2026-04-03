@@ -3,8 +3,7 @@ import axios from 'axios';
 import FeaturePageLayout from './FeaturePageLayout';
 import SEO from '../../components/common/SEO';
 import { Loader, BarChart2, TrendingUp, DollarSign, Target, Calendar } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../../lib/api';
 
 interface Trade {
   id: number;
@@ -137,7 +136,7 @@ export default function TradeAnalysisPage() {
           setLoading(false);
           return;
         }
-        const response = await axios.get(`${API_BASE_URL}/api/trades`, {
+        const response = await axios.get(`${API_URL}/api/trades`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTrades(response.data.data);

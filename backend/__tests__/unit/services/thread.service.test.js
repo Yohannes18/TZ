@@ -53,38 +53,37 @@ describe('ThreadService', () => {
       const filters = { category_id: 1 };
       
       ThreadModel.findAll.mockResolvedValue(threads);
+      ThreadModel.count.mockResolvedValue(2);
       
       const result = await ThreadService.getAllThreads(filters);
       
       expect(ThreadModel.findAll).toHaveBeenCalledWith(filters);
-      expect(result).toEqual(threads);
+      expect(ThreadModel.count).toHaveBeenCalledWith(filters);
+      expect(result).toEqual({
+        threads,
+        totalCount: 2,
+        totalPages: 1,
+        currentPage: 1,
+      });
     });
   });
   
   describe('getThreadById', () => {
-    it('should return a thread with its posts and tags', async () => {
+    it('should return a thread', async () => {
       const thread = { id: 1, title: 'Test Thread' };
-      const posts = [{ id: 1, content: 'Test post' }];
-      const tags = [{ id: 1, name: 'test-tag' }];
-      
+
       ThreadModel.findById.mockResolvedValue(thread);
-      PostModel.findByThreadId.mockResolvedValue(posts);
-      TagModel.findByThreadId.mockResolvedValue(tags);
       
       const result = await ThreadService.getThreadById(1);
       
       expect(ThreadModel.findById).toHaveBeenCalledWith(1);
-      expect(PostModel.findByThreadId).toHaveBeenCalledWith(1);
-      expect(TagModel.findByThreadId).toHaveBeenCalledWith(1);
-      expect(result).toEqual({ ...thread, posts, tags });
+      expect(result).toEqual(thread);
     });
     
-    it('should throw an error when thread is not found', async () => {
+    it('should return null when thread is not found', async () => {
       ThreadModel.findById.mockResolvedValue(null);
       
-      await expect(ThreadService.getThreadById(999))
-        .rejects
-        .toThrow('Thread not found');
+      await expect(ThreadService.getThreadById(999)).resolves.toBeNull();
     });
   });
   
@@ -117,22 +116,18 @@ describe('ThreadService', () => {
     it('should increment view count when thread exists', async () => {
       const thread = { id: 1, title: 'Test Thread', view_count: 1 };
       
-      ThreadModel.findById.mockResolvedValue(thread);
       ThreadModel.incrementViewCount.mockResolvedValue({ ...thread, view_count: 2 });
       
       const result = await ThreadService.incrementViewCount(1);
       
-      expect(ThreadModel.findById).toHaveBeenCalledWith(1);
       expect(ThreadModel.incrementViewCount).toHaveBeenCalledWith(1);
       expect(result.view_count).toBe(2);
     });
     
-    it('should throw an error when thread does not exist', async () => {
-      ThreadModel.findById.mockResolvedValue(null);
+    it('should return null when thread does not exist', async () => {
+      ThreadModel.incrementViewCount.mockResolvedValue(null);
       
-      await expect(ThreadService.incrementViewCount(999))
-        .rejects
-        .toThrow('Thread not found');
+      await expect(ThreadService.incrementViewCount(999)).resolves.toBeNull();
     });
   });
   

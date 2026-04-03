@@ -18,12 +18,12 @@ describe('TagService', () => {
       
       const createdTag = { id: 1, ...tagData, usage_count: 0 };
       
-      TagModel.findBySlug.mockResolvedValue(null);
+      TagModel.findByName.mockResolvedValue(null);
       TagModel.create.mockResolvedValue(createdTag);
       
       const result = await TagService.createTag(tagData);
       
-      expect(TagModel.findBySlug).toHaveBeenCalledWith(tagData.slug);
+      expect(TagModel.findByName).toHaveBeenCalledWith(tagData.name);
       expect(TagModel.create).toHaveBeenCalledWith(tagData);
       expect(result).toEqual(createdTag);
     });
@@ -56,11 +56,11 @@ describe('TagService', () => {
       
       const existingTag = { id: 1, ...tagData, usage_count: 0 };
       
-      TagModel.findBySlug.mockResolvedValue(existingTag);
+      TagModel.findByName.mockResolvedValue(existingTag);
       
       await expect(TagService.createTag(tagData))
         .rejects
-        .toThrow('Tag with this slug already exists');
+        .toThrow('Tag with this name already exists');
     });
   });
   
@@ -93,18 +93,18 @@ describe('TagService', () => {
     });
   });
   
-  describe('getTagsByThreadId', () => {
+  describe('getTagsForThread', () => {
     it('should return all tags for a thread', async () => {
       const tags = [
         { id: 1, name: 'Tag 1', slug: 'tag-1' },
         { id: 2, name: 'Tag 2', slug: 'tag-2' }
       ];
       
-      TagModel.findByThreadId.mockResolvedValue(tags);
+      TagModel.getTagsForThread.mockResolvedValue(tags);
       
-      const result = await TagService.getTagsByThreadId(1);
+      const result = await TagService.getTagsForThread(1);
       
-      expect(TagModel.findByThreadId).toHaveBeenCalledWith(1);
+      expect(TagModel.getTagsForThread).toHaveBeenCalledWith(1);
       expect(result).toEqual(tags);
     });
   });

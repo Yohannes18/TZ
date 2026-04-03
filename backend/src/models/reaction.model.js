@@ -1,16 +1,32 @@
 import { pool } from '../db.js';
 
 export class ReactionModel {
+  static buildTargetWhereClause(post_id, thread_id) {
+    if (post_id) {
+      return {
+        clause: 'post_id = $2 AND thread_id IS NULL',
+        values: [post_id],
+      };
+    }
+
+    return {
+      clause: 'thread_id = $2 AND post_id IS NULL',
+      values: [thread_id],
+    };
+  }
+
   static async createReaction(reactionData) {
     const client = await pool.connect();
     try {
       const { user_id, post_id, thread_id, type } = reactionData;
+      const targetId = post_id || thread_id;
+      const { clause } = this.buildTargetWhereClause(post_id, thread_id);
       
       // Check if reaction already exists
       const existing = await client.query(
         `SELECT * FROM reactions 
-         WHERE user_id = $1 AND post_id = $2 AND thread_id = $3 AND type = $4`,
-        [user_id, post_id, thread_id, type]
+         WHERE user_id = $1 AND ${clause} AND type = $3`,
+        [user_id, targetId, type]
       );
       
       if (existing.rows.length > 0) {
@@ -56,11 +72,13 @@ export class ReactionModel {
     const client = await pool.connect();
     try {
       const { user_id, post_id, thread_id, type } = reactionData;
+      const targetId = post_id || thread_id;
+      const { clause } = this.buildTargetWhereClause(post_id, thread_id);
       const result = await client.query(
         `DELETE FROM reactions 
-         WHERE user_id = $1 AND (($2 IS NULL AND thread_id = $3) OR ($3 IS NULL AND post_id = $2)) AND type = $4
+         WHERE user_id = $1 AND ${clause} AND type = $3
          RETURNING *`,
-        [user_id, post_id, thread_id, type]
+        [user_id, targetId, type]
       );
       
       // Update user stats
@@ -128,10 +146,12 @@ export class ReactionModel {
   static async getUserReaction(user_id, post_id, thread_id, type) {
     const client = await pool.connect();
     try {
+      const targetId = post_id || thread_id;
+      const { clause } = this.buildTargetWhereClause(post_id, thread_id);
       const result = await client.query(
         `SELECT * FROM reactions 
-         WHERE user_id = $1 AND (($2 IS NULL AND thread_id = $3) OR ($3 IS NULL AND post_id = $2)) AND type = $4`,
-        [user_id, post_id, thread_id, type]
+         WHERE user_id = $1 AND ${clause} AND type = $3`,
+        [user_id, targetId, type]
       );
       return result.rows[0];
     } finally {

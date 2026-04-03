@@ -1,5 +1,6 @@
 export default {
   testEnvironment: 'node',
+  injectGlobals: true,
   collectCoverageFrom: [
     'src/**/*.js'
   ],
@@ -11,8 +12,7 @@ export default {
   resetMocks: false,
   clearMocks: true,
   restoreMocks: true,
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
-  transform: {}
+  transform: {
+    '^.+\\.js$': 'babel-jest'
+  }
 };

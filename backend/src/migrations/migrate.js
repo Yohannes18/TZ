@@ -1,18 +1,22 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { pool } from '../db.js';
-
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function runMigrations() {
   const client = await pool.connect();
   
   try {
     // Read all .sql files in the migrations directory
-    const migrationDir = path.join(__dirname);
+    const migrationDirCandidates = [
+      path.resolve(process.cwd(), 'src', 'migrations'),
+      path.resolve(process.cwd(), 'backend', 'src', 'migrations'),
+    ];
+    const migrationDir = migrationDirCandidates.find((dir) => fs.existsSync(dir));
+
+    if (!migrationDir) {
+      throw new Error('Could not locate migrations directory');
+    }
+
     const files = fs.readdirSync(migrationDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
@@ -49,7 +53,12 @@ async function runMigrations() {
 }
 
 // Run migrations if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(process.cwd(), 'src', 'migrations', 'migrate.js')) {
+  runMigrations().catch(err => {
+    console.error('Migration error:', err);
+    process.exit(1);
+  });
+} else if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(process.cwd(), 'backend', 'src', 'migrations', 'migrate.js')) {
   runMigrations().catch(err => {
     console.error('Migration error:', err);
     process.exit(1);

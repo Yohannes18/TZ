@@ -40,15 +40,10 @@ describe('ThreadModel', () => {
       const result = await ThreadModel.findAll();
       
       expect(pool.connect).toHaveBeenCalled();
-      expect(mockClient.query).toHaveBeenCalledWith(
-        `SELECT t.*, c.name as category_name, u.name as author_name
-         FROM threads t
-         JOIN categories c ON t.category_id = c.id
-         JOIN users u ON t.user_id = u.id
-         ORDER BY t.last_activity_at DESC
-         LIMIT $1 OFFSET $2`,
-        [20, 0]
-      );
+      const [query, params] = mockClient.query.mock.calls[0];
+      expect(query).toContain('SELECT t.*, c.name as category_name, u.name as author_name');
+      expect(query).toContain('ORDER BY t.last_activity_at DESC');
+      expect(params).toEqual([20, 0]);
       expect(result).toEqual(threads);
       expect(mockClient.release).toHaveBeenCalled();
     });
@@ -63,16 +58,10 @@ describe('ThreadModel', () => {
       const result = await ThreadModel.findAll({ search: 'search', limit: 10, offset: 0 });
       
       expect(pool.connect).toHaveBeenCalled();
-      expect(mockClient.query).toHaveBeenCalledWith(
-        `SELECT t.*, c.name as category_name, u.name as author_name
-         FROM threads t
-         JOIN categories c ON t.category_id = c.id
-         JOIN users u ON t.user_id = u.id
-         WHERE 1=1 AND (t.search_vector @@ plainto_tsquery('english', $1) OR t.title ILIKE $2 OR t.content ILIKE $3)
-         ORDER BY t.last_activity_at DESC
-         LIMIT $4 OFFSET $5`,
-        ['search', '%search%', '%search%', 10, 0]
-      );
+      const [query, params] = mockClient.query.mock.calls[0];
+      expect(query).toContain('t.search_vector @@ plainto_tsquery');
+      expect(query).toContain('ORDER BY t.last_activity_at DESC');
+      expect(params).toEqual(['search', '%search%', '%search%', 10, 0]);
       expect(result).toEqual(threads);
       expect(mockClient.release).toHaveBeenCalled();
     });

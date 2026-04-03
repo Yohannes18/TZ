@@ -99,7 +99,7 @@ export class TradeController {
           skipEmptyLines: true,
           transformHeader: header => header.trim().toLowerCase().replace(' ', ''), // Normalizes header
           complete: (results) => {
-            if (results.errors.length) {
+            if (results.errors.length && process.env.NODE_ENV !== 'production') {
               console.warn('CSV parsing errors encountered:', results.errors);
             }
 
@@ -117,7 +117,9 @@ export class TradeController {
               const entryPrice = parseFloat(row.entryprice);
   
               if (!row.symbol || !row.direction || isNaN(size) || isNaN(entryPrice)) {
-                console.warn('Skipping invalid row:', row);
+                if (process.env.NODE_ENV !== 'production') {
+                  console.warn('Skipping invalid row:', row);
+                }
                 return null;
               }
   

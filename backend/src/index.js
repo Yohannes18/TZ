@@ -1,12 +1,13 @@
-import dotenv from 'dotenv';
-// Load environment variables first
-dotenv.config({ path: '.env' });
+import './config/env.js';
 
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+import helmet from 'helmet';
 import passport from 'passport';
-import { initDb } from './db.js';
+import rateLimit from 'express-rate-limit';
+import { initDb, pool } from './db.js';
 import authRouter from './routes/auth.routes.js';
 import tradeRouter from './routes/trade.routes.js';
 import categoryRouter from './routes/category.routes.js';
@@ -24,17 +25,72 @@ import errorHandler from './middleware/errorHandler.js';
 import './services/passport.js';
 
 const app = express();
+const PgSession = connectPgSimple(session);
 
 // Export the app instance for testing or other modules that need it
 export default app;
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+const isProduction = process.env.NODE_ENV === 'production';
+const sessionCookieName = process.env.SESSION_COOKIE_NAME || 'tradezella.sid';
+const sessionMaxAge = Number(process.env.SESSION_MAX_AGE_MS || 1000 * 60 * 60 * 24 * 7);
+const sessionStore = isProduction
+  ? new PgSession({
+      pool,
+      tableName: 'user_sessions',
+      createTableIfMissing: true,
+    })
+  : undefined;
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isProduction ? 300 : 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isProduction ? 25 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many authentication requests, please try again later.',
+  },
+});
+
 // Middleware
-app.use(cors());
-app.use(express.json());
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean)
+  : true;
+
+app.disable('x-powered-by');
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+app.use(globalLimiter);
+app.use(cors({
+  origin: corsOrigins,
+  credentials: true,
+}));
+app.use(express.json({ limit: '1mb' }));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_session_secret', // Replace with a real secret in production
+  name: sessionCookieName,
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
   resave: false,
   saveUninitialized: false,
+  proxy: isProduction,
+  store: sessionStore,
+  cookie: {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: sessionMaxAge,
+  },
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -45,7 +101,19 @@ app.get('/', (req, res) => {
   res.send('TradeZella Backend is running!');
 });
 
-app.use('/api/auth', authRouter);
+app.get('/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.status(200).json({ status: 'ok' });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      message: 'Database connection failed',
+    });
+  }
+});
+
+app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/trades', tradeRouter);
 app.use('/api/community/categories', categoryRouter);
 app.use('/api/community/threads', threadRouter);

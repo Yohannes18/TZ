@@ -4,14 +4,12 @@ export class FollowModel {
   static async followUser(follower_id, followed_id) {
     const client = await pool.connect();
     try {
-      console.log(`[FollowModel.followUser] Attempting to follow: follower_id=${follower_id}, followed_id=${followed_id}`);
       // Check if both users exist
       const usersExist = await client.query(
         'SELECT COUNT(*) as count FROM users WHERE id = $1 OR id = $2',
         [follower_id, followed_id]
       );
       if (parseInt(usersExist.rows[0].count) !== 2) {
-        console.error(`[FollowModel.followUser] One or both users not found: follower_id=${follower_id}, followed_id=${followed_id}`);
         throw new Error('One or both users not found.');
       }
 
@@ -57,14 +55,12 @@ export class FollowModel {
   static async unfollowUser(follower_id, followed_id) {
     const client = await pool.connect();
     try {
-      console.log(`[FollowModel.unfollowUser] Attempting to unfollow: follower_id=${follower_id}, followed_id=${followed_id}`);
       // Check if both users exist
       const usersExist = await client.query(
         'SELECT COUNT(*) as count FROM users WHERE id = $1 OR id = $2',
         [follower_id, followed_id]
       );
       if (parseInt(usersExist.rows[0].count) !== 2) {
-        console.error(`[FollowModel.unfollowUser] One or both users not found: follower_id=${follower_id}, followed_id=${followed_id}`);
         throw new Error('One or both users not found.');
       }
 

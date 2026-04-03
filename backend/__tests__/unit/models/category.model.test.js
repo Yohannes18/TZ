@@ -110,7 +110,7 @@ describe('CategoryModel', () => {
         `INSERT INTO categories (name, slug, description, icon, display_order)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [categoryData.name, categoryData.slug, categoryData.description, null, 0]
+        [categoryData.name, categoryData.slug, categoryData.description, undefined, 0]
       );
       expect(result).toEqual(createdCategory);
       expect(mockClient.release).toHaveBeenCalled();
