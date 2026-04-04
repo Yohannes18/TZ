@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/common/Button';
 import axios from 'axios';
-import { API_URL } from '../lib/api';
+import { API_BASE_URL } from '../lib/api';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ const ForgotPasswordPage: React.FC = () => {
   const handleForgotPassword = async () => {
     try {
       // This is a placeholder for the actual API call
-      await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+      await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
       setMessage('If an account with that email exists, a password reset link has been sent.');
       setError('');
     } catch (err: any) {

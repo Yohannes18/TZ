@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Button from './common/Button';
-import { API_URL } from '../lib/api';
+import { API_BASE_URL } from '../lib/api';
 
 interface CSVUploaderProps {
   onUploadSuccess: () => void;
@@ -42,7 +42,7 @@ const CSVUploader: React.FC<CSVUploaderProps> = ({ onUploadSuccess }) => {
         return;
       }
 
-      const response = await axios.post(`${API_URL}/api/trades/upload`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/trades/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,

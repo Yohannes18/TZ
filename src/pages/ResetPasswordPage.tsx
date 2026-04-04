@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
 import axios from 'axios';
-import { API_URL } from '../lib/api';
+import { API_BASE_URL } from '../lib/api';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -18,7 +18,7 @@ const ResetPasswordPage: React.FC = () => {
       return;
     }
     try {
-      await axios.post(`${API_URL}/api/auth/reset-password`, { token, password });
+      await axios.post(`${API_BASE_URL}/auth/reset-password`, { token, password });
       setMessage('Your password has been successfully reset. You can now log in with your new password.');
       setError('');
       setTimeout(() => navigate('/login'), 5000);
