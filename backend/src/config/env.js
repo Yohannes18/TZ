@@ -23,13 +23,6 @@ const invalidProductionValues = new Map([
     ['SESSION_SECRET', ['replace-with-a-long-random-session-secret', 'your_session_secret']],
 ]);
 
-const googleOauthVars = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_CALLBACK_URL'];
-const googlePlaceholderValues = new Map([
-    ['GOOGLE_CLIENT_ID', ['replace-me', 'YOUR_GOOGLE_CLIENT_ID']],
-    ['GOOGLE_CLIENT_SECRET', ['replace-me', 'YOUR_GOOGLE_CLIENT_SECRET']],
-    ['GOOGLE_CALLBACK_URL', ['http://localhost:5000/api/auth/google/callback', '/api/auth/google/callback']],
-]);
-
 const hasDatabaseConfig =
     Boolean(process.env.DATABASE_URL) ||
     ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'].every((key) => Boolean(process.env[key]));
@@ -39,16 +32,6 @@ if (process.env.NODE_ENV === 'production') {
     const invalidVars = Array.from(invalidProductionValues.entries())
         .filter(([key, blockedValues]) => process.env[key] && blockedValues.includes(process.env[key]))
         .map(([key]) => key);
-    const providedGoogleVars = googleOauthVars.filter((key) => {
-        const value = process.env[key];
-        const placeholderValues = googlePlaceholderValues.get(key) || [];
-
-        return Boolean(value) && !placeholderValues.includes(value);
-    });
-
-    if (providedGoogleVars.length > 0 && providedGoogleVars.length !== googleOauthVars.length) {
-        missingVars.push('GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET/GOOGLE_CALLBACK_URL must be configured together');
-    }
 
     if (!hasDatabaseConfig) {
         missingVars.push('DATABASE_URL or DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD');
