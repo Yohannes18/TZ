@@ -13,7 +13,7 @@ import {
   PieChart,
   Clock
 } from 'lucide-react';
-import { API_URL } from '../lib/api';
+import { API_BASE_URL } from '../lib/api';
 
 interface Trade {
   id: number;
@@ -145,12 +145,12 @@ export default function DashboardPage() {
           return;
         }
 
-        const response = await axios.get(`${API_URL}/api/dashboard/metrics`, {
+        const response = await axios.get(`${API_BASE_URL}/dashboard/metrics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         // For now, we'll still fetch trades separately for the recent trades section
-        const tradesResponse = await axios.get(`${API_URL}/api/trades`, {
+        const tradesResponse = await axios.get(`${API_BASE_URL}/trades`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

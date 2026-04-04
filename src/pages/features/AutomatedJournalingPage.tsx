@@ -3,7 +3,7 @@ import FeaturePageLayout from './FeaturePageLayout';
 import Button from '../../components/common/Button';
 import SEO from '../../components/common/SEO';
 import axios from 'axios';
-import { API_URL } from '../../lib/api';
+import { API_BASE_URL } from '../../lib/api';
 
 interface Trade {
   id: string;
@@ -58,7 +58,7 @@ export default function AutomatedJournalingPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/api/trades`, {
+      const response = await axios.get(`${API_BASE_URL}/trades`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTrades(response.data.data);
@@ -73,7 +73,7 @@ export default function AutomatedJournalingPage() {
   const fetchAIAnalysis = async (tradeId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/api/ai-analysis/${tradeId}`, {
+      const response = await axios.get(`${API_BASE_URL}/ai-analysis/${tradeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAiAnalyses(prev => ({
@@ -111,7 +111,7 @@ export default function AutomatedJournalingPage() {
     try {
       setSaving(true);
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/api/trades`, newTradeData, {
+      const response = await axios.post(`${API_BASE_URL}/trades`, newTradeData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTrades(prevTrades => [...prevTrades, response.data.data]);
@@ -143,7 +143,7 @@ export default function AutomatedJournalingPage() {
       setSaving(true);
       const token = localStorage.getItem('token');
       // This would connect to actual broker APIs in a real implementation
-      const response = await axios.post(`${API_URL}/api/brokers/sync`, {}, {
+      const response = await axios.post(`${API_BASE_URL}/brokers/sync`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(`Successfully synced ${response.data.data.tradesCount} trades from your broker.`);
@@ -166,7 +166,7 @@ export default function AutomatedJournalingPage() {
       formData.append('file', file);
       
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/api/trades/import`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/trades/import`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -185,7 +185,7 @@ export default function AutomatedJournalingPage() {
   const requestAIAnalysis = async (tradeId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/api/ai-analysis/analyze-trade/${tradeId}`, {}, {
+      const response = await axios.post(`${API_BASE_URL}/ai-analysis/analyze-trade/${tradeId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAiAnalyses(prev => ({
